@@ -1,5 +1,6 @@
+import os
+import openai
 from slugify import slugify
-
 from app.db.errors import EntityDoesNotExist
 from app.db.repositories.items import ItemsRepository
 from app.models.domain.items import Item
@@ -21,3 +22,13 @@ def get_slug_for_item(title: str) -> str:
 
 def check_user_can_modify_item(item: Item, user: User) -> bool:
     return item.seller.username == user.username
+
+
+def get_default_image(title: str) -> str:
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+    response = openai.Image.create(
+        prompt=title,
+        n=1,
+        size="256x256"
+    )
+    return response['data'][0]['url']
